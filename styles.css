@@ -1,0 +1,462 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+/* ---------- RESET ---------- */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* ---------- BODY ---------- */
+body {
+  min-height: 100vh;
+  background:
+    radial-gradient(circle at top left, #e3eeff, transparent 55%),
+    radial-gradient(circle at bottom right, #ffd6e8, #ffffff 55%);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: #0f172a;
+}
+
+/* ---------- APP WRAPPER ---------- */
+.app-wrapper {
+  width: 100%;
+  max-width: 900px;
+}
+
+/* ---------- HEADER ---------- */
+.app-header {
+  text-align: center;
+  margin-bottom: 18px;
+}
+
+.app-header h1 {
+  font-size: clamp(1.9rem, 3.3vw, 2.3rem);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.app-header p {
+  margin-top: 4px;
+  font-size: 0.9rem;
+  color: #64748b;
+}
+
+/* ---------- CARD ---------- */
+.card {
+  background: rgba(255, 255, 255, 0.85);
+  border-radius: 24px;
+  padding: 22px 22px 18px;
+  backdrop-filter: blur(18px) saturate(150%);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.18);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+}
+
+/* ---------- ADD SECTION ---------- */
+.add-section {
+  margin-bottom: 16px;
+}
+
+#bucket-form {
+  display: flex;
+  gap: 10px;
+  flex-wrap: nowrap;
+}
+
+#goal-input {
+  flex: 1;
+  border-radius: 14px;
+  border: 1px solid #e2e8f0;
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  outline: none;
+  transition: 0.2s ease;
+  background: rgba(248, 250, 252, 0.9);
+}
+
+#goal-input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.25);
+  background: #ffffff;
+}
+
+#add-btn {
+  border: none;
+  border-radius: 14px;
+  padding: 10px 16px;
+  background: linear-gradient(135deg, #2563eb, #6366f1);
+  color: #fff;
+  font-size: 0.95rem;
+  font-weight: 500;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+  transition: 0.2s ease;
+  white-space: nowrap;
+}
+
+#add-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(37, 99, 235, 0.5);
+}
+
+.hint {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+/* ---------- DASHBOARD ---------- */
+.dashboard {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 10px 0 14px;
+}
+
+.stat-box {
+  background: rgba(248, 250, 252, 0.9);
+  border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.stat-box.wide {
+  grid-column: span 1;
+}
+
+.stat-box .label {
+  font-size: 0.75rem;
+  color: #64748b;
+}
+
+.stat-box .value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: #111827;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: relative;
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb;
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 6px;
+}
+
+#progress-fill {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #22c55e, #4ade80);
+  transition: width 0.25s ease;
+}
+
+.percent {
+  font-size: 0.75rem;
+  margin-top: 4px;
+  color: #047857;
+}
+
+/* ---------- LIST SECTION ---------- */
+.list-section {
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.list-section::-webkit-scrollbar {
+  width: 6px;
+}
+.list-section::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.7);
+  border-radius: 999px;
+}
+
+#bucket-list {
+  list-style: none;
+}
+
+/* Bucket items */
+.bucket-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(248, 250, 252, 0.95);
+  border-radius: 16px;
+  padding: 9px 11px;
+  margin-bottom: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: 0.2s ease;
+}
+
+.bucket-item.show {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.bucket-item.completed {
+  background: rgba(187, 247, 208, 0.9);
+}
+
+.bucket-item.completed .item-text {
+  text-decoration: line-through;
+  color: #16a34a;
+}
+
+.item-main {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  cursor: pointer;
+}
+
+.item-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #22c55e;
+  cursor: pointer;
+}
+
+.item-text {
+  font-size: 0.9rem;
+  color: #111827;
+  word-break: break-word;
+}
+
+/* Item actions (details + delete) */
+.item-actions {
+  display: flex;
+  gap: 6px;
+}
+
+.details-btn,
+.delete-btn {
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.9rem;
+  padding: 4px 6px;
+  border-radius: 999px;
+  transition: 0.2s ease;
+}
+
+.details-btn {
+  color: #2563eb;
+}
+.details-btn:hover {
+  background: rgba(37, 99, 235, 0.09);
+}
+
+.delete-btn {
+  color: #ef4444;
+}
+.delete-btn:hover {
+  background: rgba(248, 113, 113, 0.12);
+}
+
+/* Empty message */
+.empty-message {
+  text-align: center;
+  font-size: 0.85rem;
+  margin-top: 12px;
+  color: #9ca3af;
+}
+
+/* Fade-out animation when deleting */
+.bucket-item.fade-out {
+  opacity: 0;
+  transform: translateY(6px);
+}
+
+/* Shake for invalid input */
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-3px); }
+  100% { transform: translateX(0); }
+}
+
+#goal-input.shake {
+  animation: shake 0.25s;
+}
+
+/* ---------- MOTIVATION TOAST ---------- */
+.motivation-toast {
+  position: fixed;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-20px);
+  background: rgba(15, 23, 42, 0.92);
+  color: #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.6);
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.25s ease;
+  z-index: 9999;
+}
+
+.motivation-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+/* ---------- WEEKLY REMINDER BANNER ---------- */
+.reminder-banner {
+  position: fixed;
+  top: -70px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: #0f172a;
+  color: #e5e7eb;
+  padding: 10px 16px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.78rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.8);
+  z-index: 9998;
+  transition: 0.3s ease;
+}
+
+.reminder-banner.show {
+  top: 14px;
+}
+
+.reminder-banner button {
+  border: none;
+  background: #e5e7eb;
+  color: #0f172a;
+  padding: 4px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+/* ---------- DETAIL MODAL ---------- */
+.detail-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 9997;
+  backdrop-filter: blur(6px);
+}
+
+.detail-modal.show {
+  display: flex;
+}
+
+.detail-content {
+  position: relative;
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 18px;
+  padding: 18px 20px;
+  max-width: 360px;
+  width: 90%;
+  box-shadow: 0 18px 50px rgba(15, 23, 42, 0.6);
+}
+
+.detail-content h2 {
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+}
+
+.detail-label {
+  margin-top: 8px;
+  font-size: 0.75rem;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.detail-text {
+  font-size: 0.9rem;
+  margin-top: 2px;
+  color: #111827;
+}
+
+.detail-meta {
+  font-size: 0.82rem;
+  margin-top: 2px;
+  color: #4b5563;
+}
+
+.detail-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #6b7280;
+}
+
+/* ---------- RESPONSIVE ---------- */
+@media (max-width: 700px) {
+  .card {
+    padding: 18px 16px 16px;
+    border-radius: 20px;
+  }
+
+  #bucket-form {
+    flex-direction: column;
+  }
+
+  #add-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .dashboard {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .stat-box.wide {
+    grid-column: span 2;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    align-items: stretch;
+  }
+
+  .app-wrapper {
+    max-width: 100%;
+  }
+
+  .card {
+    border-radius: 18px;
+  }
+
+  .bucket-item {
+    padding: 8px 9px;
+  }
+
+  .motivation-toast {
+    width: 90%;
+    text-align: center;
+  }
+}

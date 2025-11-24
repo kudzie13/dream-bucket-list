@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dream Bucket List</title>
+
+  <link rel="stylesheet" href="styles.css" />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+    crossorigin="anonymous"
+    referrerpolicy="no-referrer"
+  />
+</head>
+<body>
+
+  <!-- Weekly Reminder Banner -->
+  <div id="reminder-banner" class="reminder-banner">
+    <span>Don’t forget to review your dreams this week ✨</span>
+    <button id="reminder-close">Got it</button>
+  </div>
+
+  <!-- Motivational Toast -->
+  <div id="motivation-toast" class="motivation-toast"></div>
+
+  <div class="app-wrapper">
+    <header class="app-header">
+      <h1>Dream Bucket List</h1>
+      <p>Capture your goals, track your progress, and make your dreams reality.</p>
+    </header>
+
+    <main class="card">
+      <!-- Add Goal -->
+      <section class="add-section">
+        <form id="bucket-form">
+          <input
+            type="text"
+            id="goal-input"
+            placeholder="Add a new dream… (e.g., Visit Japan, Start a SaaS, Learn Blender)"
+            autocomplete="off"
+          />
+          <button type="submit" id="add-btn">
+            <i class="fa fa-plus"></i> Add
+          </button>
+        </form>
+        <p class="hint">
+          Tip: Keep goals short & specific. Tap a goal to see details, or check it when done.
+        </p>
+      </section>
+
+      <!-- Progress Dashboard -->
+      <section class="dashboard">
+        <div class="stat-box">
+          <span class="label">Total Dreams</span>
+          <span class="value" id="total-count">0</span>
+        </div>
+        <div class="stat-box">
+          <span class="label">Completed</span>
+          <span class="value" id="completed-count">0</span>
+        </div>
+        <div class="stat-box wide">
+          <span class="label">Completion</span>
+          <div class="progress-bar">
+            <div id="progress-fill"></div>
+          </div>
+          <span class="percent" id="progress-percent">0%</span>
+        </div>
+      </section>
+
+      <!-- List -->
+      <section class="list-section">
+        <ul id="bucket-list"></ul>
+        <p class="empty-message" id="empty-message">
+          Your bucket list is empty. Start by adding your first dream! ✨
+        </p>
+      </section>
+    </main>
+  </div>
+
+  <!-- Goal Detail Modal -->
+  <div id="detail-modal" class="detail-modal">
+    <div class="detail-content">
+      <button id="detail-close" class="detail-close"><i class="fa fa-times"></i></button>
+      <h2>Goal Details</h2>
+      <p class="detail-label">Dream</p>
+      <p id="detail-text" class="detail-text"></p>
+
+      <p class="detail-label">Created</p>
+      <p id="detail-created" class="detail-meta"></p>
+
+      <p class="detail-label">Status</p>
+      <p id="detail-status" class="detail-meta"></p>
+    </div>
+  </div>
+
+  <script>
+    // ====== STATE + LOCALSTORAGE ======
+    const STORAGE_KEY = 'dreamBucketList';
+    const REMINDER_KEY = 'dreamBucketReminderLastSeen';
+
+    let bucketItems = [];
+
+    const form = document.getElementById('bucket-form');
+    const goalInput = document.getElementById('goal-input');
+    const listEl = document.getElementById('bucket-list');
+    const emptyMessageEl = document.getElementById('empty-message');
+    const totalCountEl = document.getElementById('total-count');
+    const completedCountEl = document.getElementById('completed-count');
+    const progressFillEl = document.getElementById('progress-fill');
+    const progressPercentEl = document.getElementById('progress-percent');
+
+    const toastEl = document.getElementById('motivation-toast');
+
+    const detailModal = document.getElementById('detail-modal');
+    const detailTextEl = document.getElementById('detail-text');
+    const detailCreatedEl = document.getElementById('detail-created');
+    const detailStatusEl = document.getElementById('detail-status');
+    const detailCloseBtn = document.getElementById('detail-close');
+
+    const reminderBanner = document.getElementById('reminder-banner');
+    const reminderClose = document.getElementById('reminder-close');
+
+    const MOTIVATION_QUOTES = [
+      "Small steps every day lead to big destinations.",
+      "Your future self is watching. Don’t disappoint them.",
+      "Dreams don’t work unless you do.",
+      "If you can imagine it, you can plan it.",
+      "Every completed goal is proof you can do hard things.",
+      "Today’s idea can be tomorrow’s reality."
+    ];
+
+    // ====== LOAD / SAVE ======
+    function loadFromStorage() {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) {
+        try {
+          bucketItems = JSON.parse(saved);
+        } catch (e) {
+          bucketItems = [];
+        }
+      }
+      // Ensure createdAt exists for old items
+      bucketItems = bucketItems.map(item => ({
+        ...item,
+        createdAt: item.createdAt || Date.now()
+      }));
+      renderList();
+    }
+
+    function saveToStorage() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(bucketItems));
+    }
+
+    // ====== RENDER LIST ======
+    function renderList() {
+      listEl.innerHTML = '';
+
+      if (bucketItems.length === 0) {
+        emptyMessageEl.style.display = 'block';
+      } else {
+        emptyMessageEl.style.display = 'none';
+      }
+
+      bucketItems.forEach((item) => {
+        const li = document.createElement('li');
+        li.className = 'bucket-item';
+        if (item.completed) li.classList.add('completed');
+        li.dataset.id = item.id;
+
+        const label = document.createElement('label');
+        label.className = 'item-main';
+
+        const checkbox = document.createElement('input');
+        checkbox.type = 'checkbox';
+        checkbox.checked = item.completed;
+        checkbox.className = 'item-checkbox';
+
+        const spanText = document.createElement('span');
+        spanText.className = 'item-text';
+        spanText.textContent = item.text;
+
+        label.appendChild(checkbox);
+        label.appendChild(spanText);
+
+        const actions = document.createElement('div');
+        actions.className = 'item-actions';
+
+        const detailsBtn = document.createElement('button');
+        detailsBtn.className = 'details-btn';
+        detailsBtn.innerHTML = '<i class="fa fa-eye"></i>';
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerHTML = '<i class="fa fa-trash"></i>';
+
+        actions.appendChild(detailsBtn);
+        actions.appendChild(deleteBtn);
+
+        li.appendChild(label);
+        li.appendChild(actions);
+        listEl.appendChild(li);
+
+        requestAnimationFrame(() => li.classList.add('show'));
+      });
+
+      updateStats();
+    }
+
+    // ====== STATS + PROGRESS BAR ======
+    function updateStats() {
+      const total = bucketItems.length;
+      const completed = bucketItems.filter((i) => i.completed).length;
+
+      totalCountEl.textContent = total === 1 ? '1' : String(total);
+      completedCountEl.textContent = completed === 1 ? '1' : String(completed);
+
+      const percent = total === 0 ? 0 : Math.round((completed / total) * 100);
+      progressFillEl.style.width = percent + '%';
+      progressPercentEl.textContent = percent + '%';
+    }
+
+    // ====== ADD NEW ITEM ======
+    form.addEventListener('submit', function (e) {
+      e.preventDefault();
+      const text = goalInput.value.trim();
+      if (!text) {
+        goalInput.classList.add('shake');
+        setTimeout(() => goalInput.classList.remove('shake'), 400);
+        return;
+      }
+
+      const newItem = {
+        id: Date.now().toString(),
+        text,
+        completed: false,
+        createdAt: Date.now()
+      };
+
+      bucketItems.push(newItem);
+      saveToStorage();
+      renderList();
+      goalInput.value = '';
+      goalInput.focus();
+
+      showMotivationToast();
+    });
+
+    // ====== LIST INTERACTIONS (CHECK / DELETE / DETAILS) ======
+    listEl.addEventListener('click', function (e) {
+      const listItem = e.target.closest('.bucket-item');
+      if (!listItem) return;
+      const id = listItem.dataset.id;
+
+      // Check / uncheck
+      if (e.target.classList.contains('item-checkbox')) {
+        const isChecked = e.target.checked;
+        bucketItems = bucketItems.map((item) =>
+          item.id === id ? { ...item, completed: isChecked } : item
+        );
+        saveToStorage();
+        renderList();
+        return;
+      }
+
+      // Delete
+      if (e.target.closest('.delete-btn')) {
+        listItem.classList.add('fade-out');
+        setTimeout(() => {
+          bucketItems = bucketItems.filter((item) => item.id !== id);
+          saveToStorage();
+          renderList();
+        }, 200);
+        return;
+      }
+
+      // Details
+      if (e.target.closest('.details-btn') || e.target.classList.contains('item-text')) {
+        const item = bucketItems.find((i) => i.id === id);
+        if (!item) return;
+
+        detailTextEl.textContent = item.text;
+        detailCreatedEl.textContent = new Date(item.createdAt).toLocaleString();
+        detailStatusEl.textContent = item.completed ? 'Completed ✅' : 'In progress ⏳';
+
+        detailModal.classList.add('show');
+      }
+    });
+
+    // Close detail modal
+    detailCloseBtn.addEventListener('click', () => {
+      detailModal.classList.remove('show');
+    });
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.classList.remove('show');
+    });
+
+    // ====== MOTIVATIONAL TOAST ======
+    function showMotivationToast() {
+      const quote =
+        MOTIVATION_QUOTES[Math.floor(Math.random() * MOTIVATION_QUOTES.length)];
+      toastEl.textContent = quote;
+      toastEl.classList.add('show');
+
+      setTimeout(() => {
+        toastEl.classList.remove('show');
+      }, 3500);
+    }
+
+    // ====== WEEKLY REMINDER BANNER ======
+    function checkWeeklyReminder() {
+      const last = localStorage.getItem(REMINDER_KEY);
+      const now = Date.now();
+      const weekMs = 7 * 24 * 60 * 60 * 1000;
+
+      if (!last || now - Number(last) > weekMs) {
+        reminderBanner.classList.add('show');
+      }
+    }
+
+    reminderClose.addEventListener('click', () => {
+      reminderBanner.classList.remove('show');
+      localStorage.setItem(REMINDER_KEY, String(Date.now()));
+    });
+
+    // Initialize
+    loadFromStorage();
+    checkWeeklyReminder();
+  </script>
+</body>
+</html>
